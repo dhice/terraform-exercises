@@ -1,8 +1,42 @@
+resource "aws_instance" "nginx" {
+    ami                         = lookup(var.AmiLinux, var.region)
+    instance_type               = "t2.micro"
+    associate_public_ip_address = "true"
+    subnet_id                   = aws_subnet.PublicAZA.id
+    vpc_security_group_ids      = ["${aws_security_group.Nginx.id}"]
+    key_name                    = var.key_name
+    tags = {
+        Name = "NGINX"
+    }
+    user_data = <<HEREDOC
+    #!/bin/bash
+    yum update -y
+    yum install -y nginx
+    echo "http {" > /etc/nginx/nginx.conf
+    echo "  upstream backend {" >> /etc/nginx/nginx.conf
+    echo "    server app0.ShaanAWSDNS.internal ;" >> /etc/nginx/nginx.conf
+    echo "    server app1.ShaanAWSDNS.internal;" >> /etc/nginx/nginx.conf
+    echo "    server app2.ShaanAWSDNS.internal;" >> /etc/nginx/nginx.conf
+    echo "  }" >> /etc/nginx/nginx.conf
+    echo "  server {" >> /etc/nginx/nginx.conf
+    echo "    listen 80;" >> /etc/nginx/nginx.conf
+    echo "    location / {" >> /etc/nginx/nginx.conf
+    echo "      proxy_pass http://backend/myApp.php;" >> /etc/nginx/nginx.conf
+    echo "    }" >> /etc/nginx/nginx.conf
+    echo "  }" >> /etc/nginx/nginx.conf
+    echo "}" >> /etc/nginx/nginx.conf
+    echo "events {}" >> /etc/nginx/nginx.conf
+    sudo service nginx start
+}
+HEREDOC
+}
+
 resource "aws_instance" "phpapp" {
   ami                         = lookup(var.AmiLinux, var.region)
   instance_type               = "t2.micro"
-  associate_public_ip_address = "true"
-  subnet_id                   = aws_subnet.PublicAZA.id
+  associate_public_ip_address = "false"
+  count = 3
+  subnet_id                   = aws_subnet.PrivateAZA.id
   vpc_security_group_ids      = ["${aws_security_group.WebApp.id}"]
   key_name                    = var.key_name
   tags = {

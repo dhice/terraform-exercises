@@ -27,3 +27,27 @@ resource "aws_route53_record" "database" {
   ttl     = "300"
   records = ["${aws_instance.database.private_ip}"]
 }
+
+resource "aws_route53_record" "app0" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "app0.${var.DnsZoneName}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.phpapp[0].private_ip}"]
+}
+
+resource "aws_route53_record" "app1" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "app1.${var.DnsZoneName}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.phpapp[1].private_ip}"]
+}
+
+resource "aws_route53_record" "app2" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "app2.${var.DnsZoneName}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.phpapp[2].private_ip}"]
+}
