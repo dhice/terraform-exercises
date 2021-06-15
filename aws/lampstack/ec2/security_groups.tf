@@ -1,10 +1,10 @@
-resource "aws_security_group" "Nginx" {
-  name = "Nginx"
+resource "aws_security_group" "nginx_security_group" {
+  name = "nginx security group"
   tags = {
-    Name = "Nginx"
+    Name = "nginx security group"
   }
   description = "ONLY HTTP CONNECTION INBOUND"
-  vpc_id      = aws_vpc.terraformmain.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 80
@@ -17,6 +17,7 @@ resource "aws_security_group" "Nginx" {
     to_port     = "22"
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+
   }
   egress {
     from_port   = 0
@@ -26,19 +27,19 @@ resource "aws_security_group" "Nginx" {
   }
 }
 
-resource "aws_security_group" "WebApp" {
-  name = "WebApp"
+resource "aws_security_group" "webapp_security_group" {
+  name = "webapp security group"
   tags = {
-    Name = "WebApp"
+    Name = "webapp security group"
   }
   description = "ONLY ACCESSABLE BY NGINX & SSH"
-  vpc_id      = aws_vpc.terraformmain.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "TCP"
-    security_groups = ["${aws_security_group.Nginx.id}"]
+    security_groups = ["${aws_security_group.nginx_security_group.id}"]
   }
   ingress {
     from_port   = "22"
@@ -54,18 +55,18 @@ resource "aws_security_group" "WebApp" {
   }
 }
 
-resource "aws_security_group" "MySQLDB" {
-  name = "MySQLDB"
+resource "aws_security_group" "db_security_group" {
+  name = "db security group"
   tags = {
-    Name = "MySQLDB"
+    Name = "db security group"
   }
   description = "ONLY ACCESSABLE BY PHP & SSH"
-  vpc_id      = aws_vpc.terraformmain.id
+  vpc_id      = var.vpc_id
   ingress {
     from_port       = 3306
     to_port         = 3306
     protocol        = "TCP"
-    security_groups = ["${aws_security_group.WebApp.id}"]
+    security_groups = ["${aws_security_group.webapp_security_group.id}"]
   }
   ingress {
     from_port   = "22"

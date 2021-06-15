@@ -1,6 +1,8 @@
 variable "region" {
-  default = "eu-west-2"
+    default = "us-east-1"
+    description = "AWS region"
 }
+
 variable "AmiLinux" {
   type = map(string)
   default = {
@@ -8,24 +10,21 @@ variable "AmiLinux" {
     eu-west-1 = "ami-ca0135b3"
     us-east-1 = "ami-14c5486b"
   }
+  description = "AWS AMI image to use for instances"
 }
-variable "vpc-fullcidr" {
-  default     = "172.16.0.0/16"
-  description = "the vpc cdir"
+
+variable "instance_type" {
+    default = "t2.micro"
+    description = "AWS EC2 instance type to run instances"
 }
-variable "Subnet-Public-AzA-CIDR" {
-  default     = "172.16.0.0/24"
-  description = "the cidr of the subnet"
+
+variable "keypair_name" {
+    default = "LAMP_keypair"
+    description = "Keypair name to connect remotely"
 }
-variable "Subnet-Private-AzA-CIDR" {
-  default     = "172.16.3.0/24"
-  description = "the cidr of the subnet"
-}
-variable "key_name" {
-  default     = "LAMP_KeyPair"
-  description = "the ssh key to use in the EC2 machines"
-}
-variable "DnsZoneName" {
-  default     = "ShaanAWSDNS.internal"
-  description = "the internal dns name"
+
+variable "webapp_count" {
+    type = number
+    default = 3
+    description = "Number of webapp instances to use"
 }
